@@ -21,6 +21,26 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
+
+
+---
+## testing class validator on request payload
+<img width="1718" height="1027" alt="image" src="https://github.com/user-attachments/assets/c590a6e9-611b-4dcd-bda2-77e708897e90" />
+
+  <img src="https://github.com/Govindv7555/Govindv7555/blob/main/49e76e0596857673c5c80c85b84394c1.gif" width="1000px" height="100px">
+  
+<img width="1705" height="920" alt="image" src="https://github.com/user-attachments/assets/c5653a38-c8fe-42e2-96d7-501e92f931be" />
+  <img src="https://github.com/Govindv7555/Govindv7555/blob/main/49e76e0596857673c5c80c85b84394c1.gif" width="1000px" height="100px">
+
+<img width="1705" height="920" alt="image" src="https://github.com/user-attachments/assets/fb79aed1-2406-4c2a-8480-4129632b383a" />
+
+  <img src="https://github.com/Govindv7555/Govindv7555/blob/main/49e76e0596857673c5c80c85b84394c1.gif" width="1000px" height="100px">
+  
+### roles can be in lowercase and still pass the validation , here is the validation of the name param if sent empty in the request payload
+
+<img width="1708" height="962" alt="image" src="https://github.com/user-attachments/assets/acc9a5c5-b948-4d58-8c79-a02403817b4f" />
+
+
 ## Description
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
