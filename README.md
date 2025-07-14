@@ -52,6 +52,12 @@
 
 <img width="1813" height="924" alt="image" src="https://github.com/user-attachments/assets/9adfb2df-32ce-452d-af3e-61558f41a9c2" />
 
+  <img src="https://github.com/Govindv7555/Govindv7555/blob/main/49e76e0596857673c5c80c85b84394c1.gif" width="1000px" height="100px">
+
+#### validating that if calling an endpoint of GET /users to an unregistered/a not found user 
+
+<img width="1848" height="919" alt="image" src="https://github.com/user-attachments/assets/830d5808-1519-447e-ab22-0efdd8f16335" />
+
 
 
 ## Description
