@@ -57,8 +57,15 @@
 #### validating that if calling an endpoint of GET /users to an unregistered/a not found user 
 
 <img width="1848" height="919" alt="image" src="https://github.com/user-attachments/assets/830d5808-1519-447e-ab22-0efdd8f16335" />
+  
+  <img src="https://github.com/Govindv7555/Govindv7555/blob/main/49e76e0596857673c5c80c85b84394c1.gif" width="1000px" height="100px">
+
+#### validating GET request of 'role' as a query param in the endpoint - "/users?role=dave" -  to a name 
 
 
+<img width="1482" height="936" alt="image" src="https://github.com/user-attachments/assets/74c714e9-97a2-4b64-80e7-2cfd7b835a65" />
+
+---
 
 ## Description
 
