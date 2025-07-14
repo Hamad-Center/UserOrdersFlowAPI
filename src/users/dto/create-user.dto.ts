@@ -1,4 +1,5 @@
-import { IsString, IsEmail, IsEnum, IsNotEmpty, isNotEmpty } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsString, IsEmail, IsEnum, IsNotEmpty, isIn, IsIn } from 'class-validator';
 
 export class CreateUserDto {
     @IsString()
@@ -6,7 +7,8 @@ export class CreateUserDto {
     name: string;
     @IsEmail()
     email: string;
-    @IsEnum(['INTERN', 'ADMIN', 'ENGINEER'], {
+    @Transform(({ value }) => value?.toUpperCase())
+    @IsIn(['INTERN', 'ADMIN', 'ENGINEER'], {
         message: 'Role must be either INTERN, ADMIN or ENGINEER'
     })
     role: 'INTERN' | 'ADMIN' | 'ENGINEER';
