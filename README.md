@@ -48,7 +48,7 @@
 
   <img src="https://github.com/Govindv7555/Govindv7555/blob/main/49e76e0596857673c5c80c85b84394c1.gif" width="1000px" height="100px">
 
-#### testing class validators for another endpoint to ensure that validation works successfully accross all other endpoints
+#### testing class validators for another endpoint to ensure that validation works successfully accross all other endpoints & make sure that the update user dto is successfully extending the validation decorators from the createUserDto
 
 <img width="1813" height="924" alt="image" src="https://github.com/user-attachments/assets/9adfb2df-32ce-452d-af3e-61558f41a9c2" />
 
