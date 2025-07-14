@@ -46,6 +46,14 @@
 
 <img width="1813" height="924" alt="image" src="https://github.com/user-attachments/assets/151dbe3a-710c-4142-9df2-36cf2f029be1" />
 
+  <img src="https://github.com/Govindv7555/Govindv7555/blob/main/49e76e0596857673c5c80c85b84394c1.gif" width="1000px" height="100px">
+
+#### testing class validators for another endpoint to ensure that validation works successfully accross all other endpoints
+
+<img width="1813" height="924" alt="image" src="https://github.com/user-attachments/assets/9adfb2df-32ce-452d-af3e-61558f41a9c2" />
+
+
+
 ## Description
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
