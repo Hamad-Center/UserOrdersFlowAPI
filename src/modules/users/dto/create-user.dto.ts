@@ -12,5 +12,4 @@ export class CreateUserDto {
         message: 'Role must be either INTERN, ADMIN or ENGINEER'
     })
     role: 'INTERN' | 'ADMIN' | 'ENGINEER';
-}
-
+} 
