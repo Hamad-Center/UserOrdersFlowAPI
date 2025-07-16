@@ -28,10 +28,74 @@
 - create a .env file with the same content of the provided .env.example file
 - install the project using 
 ```npm run docker:up```
-- to create and run migrations inside the docker container  
-```docker-compose exec api npx prisma migrate dev ```
-- i have created a seed file for the database , you just need to run 
-```docker-compose exec api npx prisma db seed ```
+
+# Prisma Database Setup & Seeding Guide (Short Version)
+
+## Prerequisites
+
+- Docker & Docker Compose installed  
+- NestJS project with Prisma  
+- PostgreSQL service in `docker-compose.yml`
+
+## Key Steps
+
+### 1. Generate Prisma Client
+
+```bash
+docker-compose exec api npx prisma generate
+```
+
+Generates a type-safe client from `prisma/schema.prisma`.
+
+### 2. Push Schema to DB
+
+```bash
+docker-compose exec api npx prisma db push
+```
+
+Syncs schema with PostgreSQL. Use for dev only.
+
+### 3. Seed Database
+
+```bash
+docker-compose exec api npx prisma db seed
+```
+
+Runs `src/database/seed.ts` to insert sample data.
+
+## Full Workflow
+
+```bash
+docker-compose up -d
+docker-compose exec api npx prisma generate
+docker-compose exec api npx prisma db push
+docker-compose exec api npx prisma db seed
+docker-compose exec api npx prisma studio
+```
+
+## Seed Output (Sample)
+
+- 10 Users (INTERN, ADMIN, ENGINEER)
+- 5 Classes
+- 10 User-Class Assignments
+
+## Common Issues
+
+**DB URL Error:**  
+Ensure `.env` has:  
+```env
+DATABASE_URL="postgresql://user:pass@pg:5432/db_name"
+```
+
+**Schema Not Found:**  
+Check `prisma/schema.prisma` exists.
+
+**Seed Errors:**  
+Ensure Prisma Client is generated & seed script is valid.
+
+## Done!
+
+You now have a working database, schema, and test data. You're ready to develop.
 > note that you have to execute the commands of migrations, database seeding inside the terminal
 of docker container to resolve the error of '$DATABASE_URL NOT RESOLVED' as the database url is configured to use the docker container hostname (pg:5432)
 > and if you executed the commands outside the docker container , it can't resolve the container name 'pg'.
