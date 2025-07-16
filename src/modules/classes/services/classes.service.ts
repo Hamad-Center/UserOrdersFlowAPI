@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { CreateClassDto } from "../dto/create-class.dto";
 import { IClassRepository } from '../interfaces/class-repository.interface'
 import { IClass, IUserClassAssignment } from '../interfaces/class.interface'
@@ -37,5 +37,12 @@ export class ClassesService {
         return this.classes;
     }
 
-
+    async findOne(id: number): Promise<IClass> {
+        const classItem = this.classes.find(c => c.id === id);
+        if (!classItem) {
+            console.error(`the requested info ${classItem} isnot found`)
+            throw new NotFoundException(`class with id ${id} isnot found...`);
+        }
+        return classItem;
+    }
 }
