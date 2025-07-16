@@ -1,0 +1,76 @@
+// Prisma Schema for User Class Management System
+// Phase 1: Docker Infrastructure & Database Setup
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Model - Represents system users with roles
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  email     String   @unique @db.VarChar(320)
+  role      UserRole @default(INTERN)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  classAssignments UserClassAssignment[]
+
+  @@map("users")
+  @@index([email])
+  @@index([role])
+}
+
+// Class Model - Represents educational classes with capacity management
+model Class {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  capacity    Int      @default(25)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  userAssignments UserClassAssignment[]
+
+  @@map("classes")
+  @@index([name])
+}
+
+// UserClassAssignment Model - Represents user assignments to classes
+model UserClassAssignment {
+  id         Int                        @id @default(autoincrement())
+  userId     Int                        @map("user_id")
+  classId    Int                        @map("class_id")
+  status     UserClassAssignmentStatus  @default(ACTIVE)
+  assignedAt DateTime                   @default(now()) @map("assigned_at")
+  updatedAt  DateTime                   @updatedAt @map("updated_at")
+
+  // Relationships
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, classId], name: "unique_user_class_assignment")
+  @@map("user_class_assignments")
+  @@index([userId])
+  @@index([classId])
+  @@index([status])
+}
+
+// Enums
+enum UserRole {
+  INTERN
+  ADMIN
+  ENGINEER
+}
+
+enum UserClassAssignmentStatus {
+  ACTIVE
+  INACTIVE
+} 

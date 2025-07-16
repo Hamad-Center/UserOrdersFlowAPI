@@ -21,8 +21,20 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
+---
 
-
+## Docker setup
+- ensure you have got docker installed and running successfully on your system.
+- create a .env file with the same content of the provided .env.example file
+- install the project using 
+```npm run docker:up```
+- to create and run migrations inside the docker container  
+```docker-compose exec api npx prisma migrate dev ```
+- i have created a seed file for the database , you just need to run 
+```docker-compose exec api npx prisma db seed ```
+> note that you have to execute the commands of migrations, database seeding inside the terminal
+of docker container to resolve the error of '$DATABASE_URL NOT RESOLVED' as the database url is configured to use the docker container hostname (pg:5432)
+> and if you executed the commands outside the docker container , it can't resolve the container name 'pg'.
 ---
 ## testing class validator on request payload
 <img width="1718" height="1027" alt="image" src="https://github.com/user-attachments/assets/c590a6e9-611b-4dcd-bda2-77e708897e90" />
