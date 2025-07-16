@@ -1,0 +1,43 @@
+# Environment Configuration Template
+# User Class Management API - Phase 1
+# Copy to .env for development
+
+# Node Environment
+NODE_ENV=development
+
+# API Configuration
+API_PORT=3000
+API_HOST=0.0.0.0
+
+# Database Configuration
+# For Docker: use container names (pg:5432, redis:6379)
+# For Local: use localhost (localhost:5432, localhost:6379)
+DATABASE_URL="postgresql://sa:get@get1@pg:5432/user_class_management"
+
+# Redis Configuration
+REDIS_URL="redis://redis:6379"
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+# JWT Configuration
+JWT_SECRET="your-super-secret-jwt-key-change-in-production"
+JWT_EXPIRES_IN="24h"
+
+# Logging
+LOG_LEVEL=debug
+
+# Prisma Configuration
+PRISMA_GENERATE_DATAPROXY=false
+
+# Development Features
+ENABLE_SWAGGER=true
+ENABLE_CORS=true
+
+# Batch Processing Limits
+MAX_BATCH_SIZE=1000
+BATCH_PROCESSING_TIMEOUT=30000
+
+# Database Credentials
+POSTGRES_USER=sa
+POSTGRES_PASSWORD=get@get1
+POSTGRES_DB=user_class_management 
