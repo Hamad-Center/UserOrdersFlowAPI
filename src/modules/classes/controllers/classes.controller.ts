@@ -3,7 +3,9 @@ import {
     Post,
     Get,
     Body,
-    ValidationPipe
+    ValidationPipe,
+    Param,
+    ParseIntPipe
 } from "@nestjs/common";
 
 import { ClassesService } from "../services/classes.service";
@@ -25,4 +27,9 @@ export class ClassesController {
         return this.classesService.findAll();
     }
 
+    @Get(':id')
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        console.log("finding class by id", { id, context: 'ClassesController' });
+        return this.classesService.findOne(id);
+    }
 }
