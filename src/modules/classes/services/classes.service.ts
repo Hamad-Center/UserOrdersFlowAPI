@@ -33,4 +33,9 @@ export class ClassesService {
     }
 
 
+    async findAll(): Promise<IClass[]> {
+        return this.classes;
+    }
+
+
 }
