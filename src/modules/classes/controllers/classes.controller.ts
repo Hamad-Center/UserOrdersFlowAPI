@@ -18,4 +18,11 @@ export class ClassesController {
         return this.classesService.create(createClassDto);
 
     }
+
+    @Get()
+    findAll() {
+        console.log(`finding all classes`, { context: 'ClassesController' })
+        return this.classesService.findAll();
+    }
+
 }
