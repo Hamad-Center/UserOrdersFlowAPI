@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { CreateClassDto } from "../dto/create-class.dto";
 import { IClassRepository } from '../interfaces/class-repository.interface'
 import { IClass, IUserClassAssignment } from '../interfaces/class.interface'
+import { UpdateClassDto } from "../dto/update-class.dto";
+import { clearScreenDown } from "readline";
 
 @Injectable()
 export class ClassesService {
@@ -44,5 +46,18 @@ export class ClassesService {
             throw new NotFoundException(`class with id ${id} isnot found...`);
         }
         return classItem;
+    }
+    async update(id: number, updateClassDto: UpdateClassDto): Promise<IClass> {
+        const classItemIndex = this.classes.findIndex(c => c.id === id);
+        if (classItemIndex === -1) {
+            throw new NotFoundException(`class with id ${id} isnot found`);
+        }
+
+        this.classes[classItemIndex] = {
+            ...this.classes[classItemIndex],
+            ...updateClassDto,
+            updatedAt: new Date(),
+        };
+        return this.classes[classItemIndex];
     }
 }
