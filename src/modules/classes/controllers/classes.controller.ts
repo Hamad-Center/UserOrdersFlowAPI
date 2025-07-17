@@ -5,11 +5,13 @@ import {
     Body,
     ValidationPipe,
     Param,
-    ParseIntPipe
+    ParseIntPipe,
+    Patch
 } from "@nestjs/common";
 
 import { ClassesService } from "../services/classes.service";
 import { CreateClassDto } from "../dto/create-class.dto";
+import { UpdateClassDto } from "../dto/update-class.dto";
 
 @Controller('classes')
 export class ClassesController {
@@ -31,5 +33,14 @@ export class ClassesController {
     findOne(@Param('id', ParseIntPipe) id: number) {
         console.log("finding class by id", { id, context: 'ClassesController' });
         return this.classesService.findOne(id);
+    }
+
+    @Patch(':id')
+    update(
+        @Param('id', ParseIntPipe) id: number,
+        @Body(ValidationPipe) updateClassDto: UpdateClassDto
+    ) {
+        console.log(`updating class , ${id}, context ${ClassesController}`)
+        return this.classesService.update(id, updateClassDto);
     }
 }
