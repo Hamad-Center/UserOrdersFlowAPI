@@ -4,6 +4,7 @@ import { IClassRepository } from '../interfaces/class-repository.interface'
 import { IClass, IUserClassAssignment } from '../interfaces/class.interface'
 import { UpdateClassDto } from "../dto/update-class.dto";
 import { clearScreenDown } from "readline";
+import { notContains } from "class-validator";
 
 @Injectable()
 export class ClassesService {
@@ -59,5 +60,13 @@ export class ClassesService {
             updatedAt: new Date(),
         };
         return this.classes[classItemIndex];
+    }
+
+    async delete(id: number): Promise<void> {
+        const classToBeDeleted = this.classes.findIndex(c => c.id === id);
+        if (classToBeDeleted === -1) {
+            throw new NotFoundException(`class with specific id ${id} is not found.`)
+        }
+        this.classes.splice(classToBeDeleted, 1);
     }
 }
