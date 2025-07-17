@@ -6,7 +6,10 @@ import {
     ValidationPipe,
     Param,
     ParseIntPipe,
-    Patch
+    Patch,
+    Delete,
+    HttpCode,
+    HttpStatus
 } from "@nestjs/common";
 
 import { ClassesService } from "../services/classes.service";
@@ -42,5 +45,12 @@ export class ClassesController {
     ) {
         console.log(`updating class , ${id}, context ${ClassesController}`)
         return this.classesService.update(id, updateClassDto);
+    }
+
+    @Delete(':id')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    delete(@Param('id', ParseIntPipe) id: number) {
+        console.log('deleting class ', { id, context: 'ClassController' });
+        return this.classesService.delete(id);
     }
 }
