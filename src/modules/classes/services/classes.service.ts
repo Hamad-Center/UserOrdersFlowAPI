@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { CreateClassDto } from "../dto/create-class.dto";
 import { IClassRepository } from '../interfaces/class-repository.interface'
 import { IClass, IUserClassAssignment } from '../interfaces/class.interface'
 import { UpdateClassDto } from "../dto/update-class.dto";
 import { clearScreenDown } from "readline";
 import { notContains } from "class-validator";
+import { AssignUserToClassDto } from "../dto/assign-user-to-class.dto";
 
 @Injectable()
 export class ClassesService {
@@ -68,5 +69,30 @@ export class ClassesService {
             throw new NotFoundException(`class with specific id ${id} is not found.`)
         }
         this.classes.splice(classToBeDeleted, 1);
+    }
+
+    // this is the user class core business logic 
+    async assignUserToClass(assignmentDto: AssignUserToClassDto): Promise<IUserClassAssignment> {
+        // will check class capacity at first 
+        const classItem = await this.findOne(assignmentDto.classId);
+        const currentAssignments = this.assignements.filter(
+            a => a.classId === assignmentDto.classId && a.status === 'ACTIVE'
+        );
+
+        if (currentAssignments.length >= classItem.capacity) {
+            throw new BadRequestException(`class is at full capacity`)
+        }
+
+        const highestId = Math.max(...this.assignements.map(a => a.id), 0);
+
+        const assignement: IUserClassAssignment = {
+            id: highestId + 1,
+            userId: assignmentDto.userId,
+            classId: assignmentDto.classId,
+            assignedAt: new Date(),
+            status: assignmentDto.status || 'ACTIVE',
+        };
+        this.assignements.push(assignement);
+        return assignement;
     }
 }
