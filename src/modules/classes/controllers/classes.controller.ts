@@ -15,6 +15,8 @@ import {
 import { ClassesService } from "../services/classes.service";
 import { CreateClassDto } from "../dto/create-class.dto";
 import { UpdateClassDto } from "../dto/update-class.dto";
+import { AssignUserToClassDto } from "../dto/assign-user-to-class.dto";
+import { IUserClassAssignment } from "../interfaces/class.interface";
 
 @Controller('classes')
 export class ClassesController {
@@ -53,4 +55,13 @@ export class ClassesController {
         console.log('deleting class ', { id, context: 'ClassController' });
         return this.classesService.delete(id);
     }
+
+    //* user-class assignment endpoints 
+    @Post('assignments')
+    assignUserToClass(@Body(ValidationPipe) assignmentDto: AssignUserToClassDto) {
+        console.log('assigning user to class', { context: 'classesController' });
+        return this.classesService.assignUserToClass(assignmentDto);
+    }
+
+
 }
