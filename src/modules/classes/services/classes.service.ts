@@ -118,4 +118,8 @@ export class ClassesService {
         }
         this.assignements[assignmentIndex].status = 'INACTIVE';
     }
+
+    async getUserAssignments(userId: number): Promise<IUserClassAssignment[]> {
+        return this.assignements.filter(a => a.userId === userId);
+    }
 }

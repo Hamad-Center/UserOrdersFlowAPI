@@ -73,4 +73,9 @@ export class ClassesController {
         return this.classesService.unAssignUserFromClass(userId, classId);
     }
 
+    @Get('assignments/users/:userId')
+    getUserAssignments(@Param('userId', ParseIntPipe) userId: number) {
+        console.log('getting user assignements', { userId, context: 'ClassesController' })
+        return this.classesService.getUserAssignments(userId);
+    }
 }
