@@ -1,12 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { CreateClassDto } from "../dto/create-class.dto";
-import { IClassRepository } from '../interfaces/class-repository.interface'
 import { IClass, IUserClassAssignment } from '../interfaces/class.interface'
 import { UpdateClassDto } from "../dto/update-class.dto";
-import { clearScreenDown } from "readline";
-import { notContains } from "class-validator";
 import { AssignUserToClassDto } from "../dto/assign-user-to-class.dto";
-import { exists } from "fs";
+import { BatchAssignUsersDto } from "../dto/batch-assign-users.dto";
+import { BatchStatus, IBatchJob, IBatchResponse } from "../interfaces/batch.interface";
+import { BatchProcessorService } from '../services/batch-processor.service'
 
 @Injectable()
 export class ClassesService {
@@ -23,6 +22,11 @@ export class ClassesService {
     ];
 
     private assignements: IUserClassAssignment[] = [];
+    constructor(
+        private readonly batchProcessor: BatchProcessorService
+    ) { }
+
+
 
     async create(createClassDto: CreateClassDto): Promise<IClass> {
         const highestId = this.classes.map(c => c.id).reduce((max, id) => Math.max(max, id), 0);
@@ -126,4 +130,57 @@ export class ClassesService {
     async getClassAssignments(classId: number): Promise<IUserClassAssignment[]> {
         return this.assignements.filter(a => a.classId === classId);
     }
+
+    async processBatchAssignments(batchDto: BatchAssignUsersDto): Promise<IBatchResponse> {
+        if (batchDto.assignments.length > 1000) {
+            throw new BadRequestException(`batch size cannot exceed 1000 assignments`);
+        }
+
+        if (batchDto.assignments.length === 0) {
+            throw new BadRequestException(`batch must contain at least 1 assignment`);
+        }
+
+        const batchId = batchDto.correlationId || `batch_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        console.log('Creating batch job', {
+            batchId,
+            count: batchDto.assignments.length,
+            context: 'ClassesService'
+        });
+
+        const job = this.batchProcessor.createBatchJob(batchId, batchDto.assignments.length);
+
+
+        this.batchProcessor.processBatchInBackground(
+            batchId,
+            batchDto.assignments,
+            async (assignment) => {
+                // this is where the actual assignment happens 
+                await this.assignUserToClass(assignment);
+            }
+        ).catch(error => {
+            console.error(`batch ${batchId} processing failed: `, error);
+        });
+
+        // estimated time for the batch to complete  
+        const estimatedMs = batchDto.assignments.length * 100;
+        const estimatedCompletion = new Date(Date.now() + estimatedMs).toString();
+
+        return {
+            message: 'batch procssing started successfully and has been accepted for processing.',
+            batchId,
+            status: BatchStatus.PENDING,
+            totalItems: batchDto.assignments.length,
+            estimatedCompletionTime: estimatedCompletion
+        };
+
+    }
+
+    async getBatchStatus(batchId: string): Promise<IBatchJob> {
+        const job = this.batchProcessor.getBatchJob(batchId);
+        if (!job) {
+            throw new NotFoundException(`batch job ${batchId} not found`);
+        }
+        return job;
+    }
+
 }
