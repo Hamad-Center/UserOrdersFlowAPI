@@ -88,7 +88,7 @@ export class ClassesController {
 
     // batch operations (async processing)
 
-    @Post('assignmets/batch')
+    @Post('assignments/batch')
     @HttpCode(HttpStatus.ACCEPTED)
     async batchAssignUsers(@Body(ValidationPipe) batchDto: BatchAssignUsersDto) {
         console.log(
