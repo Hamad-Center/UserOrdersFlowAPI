@@ -17,6 +17,7 @@ import { CreateClassDto } from "../dto/create-class.dto";
 import { UpdateClassDto } from "../dto/update-class.dto";
 import { AssignUserToClassDto } from "../dto/assign-user-to-class.dto";
 import { IUserClassAssignment } from "../interfaces/class.interface";
+import { BatchAssignUsersDto } from "../dto/batch-assign-users.dto";
 
 @Controller('classes')
 export class ClassesController {
@@ -83,5 +84,20 @@ export class ClassesController {
     getClassAssignments(@Param('classId', ParseIntPipe) classId: number) {
         console.log('getting class assignments', { classId, context: 'ClassesController' });
         return this.classesService.getClassAssignments(classId);
+    }
+
+    // batch operations (async processing)
+
+    @Post('assignmets/batch')
+    @HttpCode(HttpStatus.ACCEPTED)
+    async batchAssignUsers(@Body(ValidationPipe) batchDto: BatchAssignUsersDto) {
+        console.log(
+            'batch assigning users', {
+            count: batchDto.assignments.length,
+            correlationId: batchDto.correlationId,
+            context: 'ClassesController'
+        }
+        );
+        return this.classesService.processBatchAssignments(batchDto);
     }
 }
