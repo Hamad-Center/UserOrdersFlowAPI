@@ -78,4 +78,10 @@ export class ClassesController {
         console.log('getting user assignements', { userId, context: 'ClassesController' })
         return this.classesService.getUserAssignments(userId);
     }
+
+    @Get(':classId/assignments')
+    getClassAssignments(@Param('classId', ParseIntPipe) classId: number) {
+        console.log('getting class assignments', { classId, context: 'ClassesController' });
+        return this.classesService.getClassAssignments(classId);
+    }
 }

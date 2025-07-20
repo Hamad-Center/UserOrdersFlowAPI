@@ -122,4 +122,8 @@ export class ClassesService {
     async getUserAssignments(userId: number): Promise<IUserClassAssignment[]> {
         return this.assignements.filter(a => a.userId === userId);
     }
+
+    async getClassAssignments(classId: number): Promise<IUserClassAssignment[]> {
+        return this.assignements.filter(a => a.classId === classId);
+    }
 }
