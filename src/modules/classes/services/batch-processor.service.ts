@@ -68,4 +68,39 @@ export class BatchProcessorService {
             this.logger.error(`batch ${batchId} failed completely`, error.stack)
         }
     }
+    async createBatchJob(batchId: string, totalItems: number): Promise<IBatchJob> {
+        const job: IBatchJob = {
+            batchId,
+            status: BatchStatus.PENDING,
+            totalItems,
+            processedItems: 0,
+            successCount: 0,
+            errorCount: 0,
+            errors: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        };
+        this.batchJobs.set(batchId, job);
+        return job;
+    }
+
+    getBatchJob(batchId: string): IBatchJob | undefined {
+        return this.batchJobs.get(batchId);
+    }
+
+    getAllBatchJob(): IBatchJob[] {
+        return Array.from(this.batchJobs.values());
+    }
+
+    // clean up old completed batches
+    cleanUpOldJobs(OlderThanHours: number = 24): void {
+        const cutOffTime = new Date(Date.now() - (OlderThanHours * 60 * 60 * 1000));
+
+        for (const [batchId, job] of this.batchJobs.entries()) {
+            if (job.completedAt && job.completedAt < cutOffTime) {
+                this.batchJobs.delete(batchId);
+                this.logger.debug(`cleaned up old batch job ${batchId}`);
+            }
+        }
+    }
 }
