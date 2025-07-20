@@ -108,4 +108,14 @@ export class ClassesService {
         this.assignements.push(assignement);
         return assignement;
     }
+
+    async unAssignUserFromClass(userId: number, classId: number): Promise<void> {
+        const assignmentIndex = this.assignements.findIndex(
+            a => a.userId === userId && a.classId === classId && a.status === 'ACTIVE'
+        )
+        if (assignmentIndex === -1) {
+            throw new NotFoundException('assignement not found')
+        }
+        this.assignements[assignmentIndex].status = 'INACTIVE';
+    }
 }

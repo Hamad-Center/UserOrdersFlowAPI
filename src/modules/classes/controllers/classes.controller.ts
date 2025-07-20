@@ -63,5 +63,14 @@ export class ClassesController {
         return this.classesService.assignUserToClass(assignmentDto);
     }
 
+    @Delete('assignments/users/:userId/classes/:classId')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    unassignUserFromClass(
+        @Param('userId', ParseIntPipe) userId: number,
+        @Param('classId', ParseIntPipe) classId: number
+    ) {
+        console.log(`unassigning user ${userId} from class of id ${classId}`);
+        return this.classesService.unAssignUserFromClass(userId, classId);
+    }
 
 }
