@@ -18,6 +18,7 @@ import { UpdateClassDto } from "../dto/update-class.dto";
 import { AssignUserToClassDto } from "../dto/assign-user-to-class.dto";
 import { IUserClassAssignment } from "../interfaces/class.interface";
 import { BatchAssignUsersDto } from "../dto/batch-assign-users.dto";
+import { BatchProcessorService } from "../services/batch-processor.service";
 
 @Controller('classes')
 export class ClassesController {
@@ -100,4 +101,18 @@ export class ClassesController {
         );
         return this.classesService.processBatchAssignments(batchDto);
     }
+
+    @Get('assignments/batch/:batchId/status')
+    async getBatchStatus(@Param('batchId') batchId: string) {
+        console.log('getting batch stauts', { batchId, context: 'ClassesController' });
+        return this.classesService.getBatchStatus(batchId);
+
+    }
+
+    @Get('assignments/batch')
+    async getAllBatchJobs() {
+        console.log('getting all batch jobs', { context: 'ClassesController' });
+        return this.classesService.getAllBatchJobs();
+    }
+
 }
