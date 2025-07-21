@@ -183,4 +183,8 @@ export class ClassesService {
         return job;
     }
 
+    async getAllBatchJobs(): Promise<IBatchJob[]> {
+        return this.batchProcessor.getAllBatchJob();
+    }
+
 }
