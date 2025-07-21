@@ -92,15 +92,47 @@ export class BatchProcessorService {
         return Array.from(this.batchJobs.values());
     }
 
-    // clean up old completed batches
-    cleanUpOldJobs(OlderThanHours: number = 24): void {
-        const cutOffTime = new Date(Date.now() - (OlderThanHours * 60 * 60 * 1000));
+    // Clean up old completed batches (24+ hours old)
+    cleanUpOldJobs(olderThanHours: number = 24): number {
+        const cutOffTime = new Date(Date.now() - (olderThanHours * 60 * 60 * 1000));
+        let cleanedCount = 0;
 
         for (const [batchId, job] of this.batchJobs.entries()) {
             if (job.completedAt && job.completedAt < cutOffTime) {
                 this.batchJobs.delete(batchId);
-                this.logger.debug(`cleaned up old batch job ${batchId}`);
+                cleanedCount++;
+                this.logger.debug(`cleaned up old batch job ${batchId} (completed: ${job.completedAt})`);
             }
         }
+
+        this.logger.log(`cleaned up ${cleanedCount} old batch jobs (older than ${olderThanHours}h)`);
+        return cleanedCount;
+    }
+
+    // Clean up all completed batches (regardless of age)
+    cleanUpCompletedJobs(): number {
+        let cleanedCount = 0;
+
+        for (const [batchId, job] of this.batchJobs.entries()) {
+            // Clean jobs that are completed, failed, or partially successful
+            if (job.status === BatchStatus.COMPLETED ||
+                job.status === BatchStatus.FAILED ||
+                job.status === BatchStatus.PARTIAL_SUCCESS) {
+                this.batchJobs.delete(batchId);
+                cleanedCount++;
+                this.logger.debug(`cleaned up completed batch job ${batchId} (status: ${job.status})`);
+            }
+        }
+
+        this.logger.log(`cleaned up ${cleanedCount} completed batch jobs`);
+        return cleanedCount;
+    }
+
+    // Clean up ALL batch jobs (for testing/development)
+    cleanUpAllJobs(): number {
+        const totalCount = this.batchJobs.size;
+        this.batchJobs.clear();
+        this.logger.log(`cleaned up all ${totalCount} batch jobs`);
+        return totalCount;
     }
 }

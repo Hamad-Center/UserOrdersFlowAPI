@@ -187,4 +187,30 @@ export class ClassesService {
         return this.batchProcessor.getAllBatchJob();
     }
 
+    async cleanUpOldBatches(): Promise<number> {
+        const jobs = this.batchProcessor.getAllBatchJob();
+        console.log(`cleaning old batches started...`, {
+            totalJobs: jobs.length,
+            context: 'ClassesService'
+        });
+        return this.batchProcessor.cleanUpOldJobs();
+    }
+
+    async cleanUpCompletedBatches(): Promise<number> {
+        const jobs = this.batchProcessor.getAllBatchJob();
+        console.log(`cleaning completed batches started...`, {
+            totalJobs: jobs.length,
+            context: 'ClassesService'
+        });
+        return this.batchProcessor.cleanUpCompletedJobs();
+    }
+
+    async cleanUpAllBatches(): Promise<number> {
+        const jobs = this.batchProcessor.getAllBatchJob();
+        console.log(`cleaning all batches started...`, {
+            totalJobs: jobs.length,
+            context: 'ClassesService'
+        });
+        return this.batchProcessor.cleanUpAllJobs();
+    }
 }
