@@ -1,0 +1,966 @@
+{
+    "info": {
+        "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "name": "User Class Management API - PC-268",
+        "description": "# User Class Management API\n\nThis collection contains all endpoints for the NestJS Microservices Demo Application focusing on User Class Management.\n\n## Architecture\n- **3-Layer Architecture**: Controllers → Services → Repositories\n- **Domain**: User Class Management with business rules\n- **Business Logic**: Users can be assigned to classes with capacity limits and validation\n\n## Features\n- User management with role-based filtering\n- Class management with capacity control\n- User-class assignments with business rules\n- Batch processing for bulk operations\n- Comprehensive validation and error handling\n\n## Business Rules\n- Classes have capacity limits that cannot be exceeded\n- Users cannot be assigned to the same class twice\n- Batch operations are limited to 1000 assignments\n- Classes with active assignments cannot be deleted\n- Assignment status is tracked (ACTIVE/INACTIVE)\n\n## Environment Variables\nMake sure to import the environment file and select the appropriate environment (Local Development).",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "User Management",
+            "item": [
+                {
+                    "name": "Get All Users",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/users",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users"
+                            ]
+                        },
+                        "description": "Retrieve all users in the system. Optionally filter by role using query parameter.\n\n**Query Parameters:**\n- `role` (optional): Filter by user role (INTERN, ADMIN, ENGINEER)\n\n**Example:**\n- `/users` - Get all users\n- `/users?role=ADMIN` - Get only admin users"
+                    },
+                    "response": [
+                        {
+                            "name": "Success - All Users",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{baseUrl}}/users",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "users"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "[\n  {\n    \"id\": 1,\n    \"name\": \"Leanne Graham\",\n    \"email\": \"Sincere@april.biz\",\n    \"role\": \"INTERN\"\n  },\n  {\n    \"id\": 2,\n    \"name\": \"Ervin Howell\",\n    \"email\": \"Shanna@melissa.tv\",\n    \"role\": \"ADMIN\"\n  }\n]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Users by Role",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/users?role=ADMIN",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users"
+                            ],
+                            "query": [
+                                {
+                                    "key": "role",
+                                    "value": "ADMIN",
+                                    "description": "Filter by role: INTERN, ADMIN, or ENGINEER"
+                                }
+                            ]
+                        },
+                        "description": "Get users filtered by their role. Valid roles are:\n- INTERN\n- ADMIN\n- ENGINEER"
+                    }
+                },
+                {
+                    "name": "Get User by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/{{userId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "{{userId}}"
+                            ]
+                        },
+                        "description": "Retrieve a specific user by their ID.\n\n**Path Parameters:**\n- `userId`: The ID of the user to retrieve"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{baseUrl}}/users/1",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "users",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"id\": 1,\n  \"name\": \"Leanne Graham\",\n  \"email\": \"Sincere@april.biz\",\n  \"role\": \"INTERN\"\n}"
+                        },
+                        {
+                            "name": "User Not Found",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{baseUrl}}/users/999",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "users",
+                                        "999"
+                                    ]
+                                }
+                            },
+                            "status": "Not Found",
+                            "code": 404,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"statusCode\": 404,\n  \"message\": \"User not found\",\n  \"error\": \"Not Found\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Create User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"{{$randomFullName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"role\": \"ENGINEER\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/users",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users"
+                            ]
+                        },
+                        "description": "Create a new user in the system.\n\n**Request Body:**\n- `name` (required): User's full name\n- `email` (required): Valid email address\n- `role` (required): User role - must be INTERN, ADMIN, or ENGINEER\n\n**Validation Rules:**\n- Name cannot be empty\n- Email must be valid format\n- Role is automatically converted to uppercase\n- Role must be one of the allowed values"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"role\": \"ENGINEER\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/users",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "users"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"id\": 11,\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"role\": \"ENGINEER\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Update User",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Updated Name\",\n  \"role\": \"ADMIN\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/users/{{userId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "{{userId}}"
+                            ]
+                        },
+                        "description": "Update an existing user's information. All fields are optional.\n\n**Path Parameters:**\n- `userId`: The ID of the user to update\n\n**Request Body:** (all optional)\n- `name`: New name for the user\n- `email`: New email address\n- `role`: New role (INTERN, ADMIN, ENGINEER)"
+                    }
+                },
+                {
+                    "name": "Delete User",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/{{userId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "{{userId}}"
+                            ]
+                        },
+                        "description": "Delete a user from the system.\n\n**Path Parameters:**\n- `userId`: The ID of the user to delete\n\n**Note:** This will also affect any class assignments for this user."
+                    }
+                }
+            ],
+            "description": "User management endpoints for CRUD operations with role-based functionality."
+        },
+        {
+            "name": "Class Management",
+            "item": [
+                {
+                    "name": "Get All Classes",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/classes",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "classes"
+                            ]
+                        },
+                        "description": "Retrieve all classes in the system with their capacity information."
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{baseUrl}}/classes",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "classes"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "[\n  {\n    \"id\": 1,\n    \"name\": \"Advanced TypeScript Development\",\n    \"capacity\": 25,\n    \"description\": \"Learn advanced TypeScript patterns\",\n    \"createdAt\": \"2025-01-01T00:00:00.000Z\",\n    \"updatedAt\": \"2025-01-01T00:00:00.000Z\"\n  }\n]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Class by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/classes/{{classId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "classes",
+                                "{{classId}}"
+                            ]
+                        },
+                        "description": "Retrieve a specific class by its ID.\n\n**Path Parameters:**\n- `classId`: The ID of the class to retrieve"
+                    }
+                },
+                {
+                    "name": "Create Class",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"{{$randomLoremWords}} Programming\",\n  \"capacity\": {{$randomInt}},\n  \"description\": \"{{$randomLoremSentence}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/classes",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "classes"
+                            ]
+                        },
+                        "description": "Create a new class with capacity management.\n\n**Request Body:**\n- `name` (required): Class name\n- `capacity` (required): Maximum number of students (minimum 1)\n- `description` (optional): Class description\n\n**Business Rules:**\n- Capacity must be at least 1\n- Name cannot be empty"
+                    }
+                },
+                {
+                    "name": "Update Class",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Updated Class Name\",\n  \"capacity\": 30,\n  \"description\": \"Updated description\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/classes/{{classId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "classes",
+                                "{{classId}}"
+                            ]
+                        },
+                        "description": "Update an existing class. All fields are optional.\n\n**Path Parameters:**\n- `classId`: The ID of the class to update\n\n**Request Body:** (all optional)\n- `name`: New class name\n- `capacity`: New capacity limit\n- `description`: New description"
+                    }
+                },
+                {
+                    "name": "Delete Class",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/classes/{{classId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "classes",
+                                "{{classId}}"
+                            ]
+                        },
+                        "description": "Delete a class from the system.\n\n**Path Parameters:**\n- `classId`: The ID of the class to delete\n\n**Business Rule:** Cannot delete classes that have active user assignments."
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{baseUrl}}/classes/1",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "classes",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "status": "No Content",
+                            "code": 204,
+                            "_postman_previewlanguage": null,
+                            "header": [],
+                            "cookie": [],
+                            "body": null
+                        },
+                        {
+                            "name": "Cannot Delete - Has Active Assignments",
+                            "originalRequest": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{baseUrl}}/classes/1",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "classes",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "status": "Bad Request",
+                            "code": 400,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"statusCode\": 400,\n  \"message\": \"Cannot delete class with active assignments. Please unassign users first.\",\n  \"error\": \"Bad Request\"\n}"
+                        }
+                    ]
+                }
+            ],
+            "description": "Class management endpoints for creating and managing educational classes with capacity control."
+        },
+        {
+            "name": "User-Class Assignments",
+            "item": [
+                {
+                    "name": "Assign User to Class",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"userId\": {{userId}},\n  \"classId\": {{classId}},\n  \"status\": \"ACTIVE\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/classes/assignments",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "classes",
+                                "assignments"
+                            ]
+                        },
+                        "description": "Assign a user to a class with business rule validation.\n\n**Request Body:**\n- `userId` (required): ID of the user to assign\n- `classId` (required): ID of the class to assign to\n- `status` (optional): Assignment status (ACTIVE or INACTIVE, defaults to ACTIVE)\n\n**Business Rules:**\n- Class must not be at full capacity\n- User cannot be assigned to the same class twice\n- Both user and class must exist"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"userId\": 1,\n  \"classId\": 1,\n  \"status\": \"ACTIVE\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/classes/assignments",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "classes",
+                                        "assignments"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"classId\": 1,\n  \"assignedAt\": \"2025-01-15T12:00:00.000Z\",\n  \"status\": \"ACTIVE\"\n}"
+                        },
+                        {
+                            "name": "Class at Full Capacity",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"userId\": 2,\n  \"classId\": 1\n}"
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/classes/assignments",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "classes",
+                                        "assignments"
+                                    ]
+                                }
+                            },
+                            "status": "Bad Request",
+                            "code": 400,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"statusCode\": 400,\n  \"message\": \"Class is at full capacity\",\n  \"error\": \"Bad Request\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Unassign User from Class",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/classes/assignments/users/{{userId}}/classes/{{classId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "classes",
+                                "assignments",
+                                "users",
+                                "{{userId}}",
+                                "classes",
+                                "{{classId}}"
+                            ]
+                        },
+                        "description": "Remove a user's assignment from a class (soft delete - changes status to INACTIVE).\n\n**Path Parameters:**\n- `userId`: ID of the user to unassign\n- `classId`: ID of the class to unassign from\n\n**Note:** This performs a soft delete by changing the assignment status to INACTIVE."
+                    }
+                },
+                {
+                    "name": "Get User's Class Assignments",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/classes/assignments/users/{{userId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "classes",
+                                "assignments",
+                                "users",
+                                "{{userId}}"
+                            ]
+                        },
+                        "description": "Get all class assignments for a specific user.\n\n**Path Parameters:**\n- `userId`: ID of the user whose assignments to retrieve\n\n**Returns:** List of all assignments (both ACTIVE and INACTIVE) for the user."
+                    }
+                },
+                {
+                    "name": "Get Class Assignments",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/classes/{{classId}}/assignments",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "classes",
+                                "{{classId}}",
+                                "assignments"
+                            ]
+                        },
+                        "description": "Get all user assignments for a specific class.\n\n**Path Parameters:**\n- `classId`: ID of the class whose assignments to retrieve\n\n**Returns:** List of all users assigned to the class with their assignment details."
+                    }
+                },
+                {
+                    "name": "Batch Assign Users (Async)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"assignments\": [\n    {\n      \"userId\": 1,\n      \"classId\": 1,\n      \"status\": \"ACTIVE\"\n    },\n    {\n      \"userId\": 2,\n      \"classId\": 1,\n      \"status\": \"ACTIVE\"\n    },\n    {\n      \"userId\": 3,\n      \"classId\": 2,\n      \"status\": \"ACTIVE\"\n    }\n  ],\n  \"correlationId\": \"batch_{{$timestamp}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/classes/assignments/batch",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "classes",
+                                "assignments",
+                                "batch"
+                            ]
+                        },
+                        "description": "Submit a batch of user-class assignments for processing. This endpoint returns immediately with 202 Accepted.\n\n**Request Body:**\n- `assignments` (required): Array of assignment objects (max 1000)\n- `correlationId` (optional): Tracking ID for the batch operation\n\n**Business Rules:**\n- Maximum 1000 assignments per batch\n- Each assignment validated individually\n- Partial failures are handled gracefully\n- Returns 202 Accepted for async processing\n\n**Future Enhancement:** In Phase 3, this will trigger Redis-based async processing."
+                    },
+                    "response": [
+                        {
+                            "name": "Batch Accepted",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"assignments\": [\n    {\n      \"userId\": 1,\n      \"classId\": 1\n    },\n    {\n      \"userId\": 2,\n      \"classId\": 1\n    }\n  ],\n  \"correlationId\": \"batch_123456\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/classes/assignments/batch",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "classes",
+                                        "assignments",
+                                        "batch"
+                                    ]
+                                }
+                            },
+                            "status": "Accepted",
+                            "code": 202,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"message\": \"Batch accepted for processing\",\n  \"batchId\": \"batch_123456\"\n}"
+                        },
+                        {
+                            "name": "Batch Too Large",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"assignments\": [\"... over 1000 assignments ...\"]\n}"
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/classes/assignments/batch",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "classes",
+                                        "assignments",
+                                        "batch"
+                                    ]
+                                }
+                            },
+                            "status": "Bad Request",
+                            "code": 400,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"statusCode\": 400,\n  \"message\": \"Batch size too large\",\n  \"error\": \"Bad Request\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Clear Completed Batch Jobs",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/classes/assignments/batch/clear",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "classes",
+                                "assignments",
+                                "batch",
+                                "clear"
+                            ]
+                        },
+                        "description": "Clear all completed batch jobs (regardless of age). This removes jobs with status COMPLETED, FAILED, or PARTIAL_SUCCESS.\n\n**Operation:** `clear_completed`\n**Target:** Jobs with final status (not PENDING or PROCESSING)\n**Use Case:** Regular cleanup after batch operations are done\n\n**Response Fields:**\n- `message`: Success/failure message\n- `jobsCleared`: Number of jobs removed\n- `totalJobsBefore`: Jobs count before cleanup\n- `remainingJobs`: Jobs count after cleanup\n- `operation`: Type of cleanup performed"
+                    },
+                    "response": [
+                        {
+                            "name": "Success - Jobs Cleared",
+                            "originalRequest": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{baseUrl}}/classes/assignments/batch/clear",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "classes",
+                                        "assignments",
+                                        "batch",
+                                        "clear"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"message\": \"Successfully cleared 3 completed jobs\",\n  \"jobsCleared\": 3,\n  \"totalJobsBefore\": 5,\n  \"remainingJobs\": 2,\n  \"operation\": \"clear_completed\"\n}"
+                        },
+                        {
+                            "name": "No Jobs To Clear",
+                            "originalRequest": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{baseUrl}}/classes/assignments/batch/clear",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "classes",
+                                        "assignments",
+                                        "batch",
+                                        "clear"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"message\": \"No completed jobs to clear\",\n  \"jobsCleared\": 0,\n  \"totalJobsBefore\": 2,\n  \"remainingJobs\": 2,\n  \"operation\": \"clear_completed\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Clear Old Batch Jobs (24+ hours)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/classes/assignments/batch/clear/old",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "classes",
+                                "assignments",
+                                "batch",
+                                "clear",
+                                "old"
+                            ]
+                        },
+                        "description": "Clear only old completed batch jobs (older than 24 hours). This is a conservative cleanup that only removes jobs completed more than 24 hours ago.\n\n**Operation:** `clear_old`\n**Target:** Jobs completed 24+ hours ago with `completedAt` timestamp\n**Use Case:** Automated cleanup of historical data\n\n**Business Logic:**\n- Only clears jobs with `completedAt` field\n- Only clears jobs older than 24 hours\n- Preserves recent jobs for debugging/monitoring"
+                    },
+                    "response": [
+                        {
+                            "name": "Old Jobs Cleared",
+                            "originalRequest": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{baseUrl}}/classes/assignments/batch/clear/old",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "classes",
+                                        "assignments",
+                                        "batch",
+                                        "clear",
+                                        "old"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"message\": \"Successfully cleared 2 old jobs\",\n  \"jobsCleared\": 2,\n  \"totalJobsBefore\": 5,\n  \"remainingJobs\": 3,\n  \"operation\": \"clear_old\"\n}"
+                        },
+                        {
+                            "name": "No Old Jobs",
+                            "originalRequest": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{baseUrl}}/classes/assignments/batch/clear/old",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "classes",
+                                        "assignments",
+                                        "batch",
+                                        "clear",
+                                        "old"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"message\": \"No old jobs to clear (older than 24 hours)\",\n  \"jobsCleared\": 0,\n  \"totalJobsBefore\": 3,\n  \"remainingJobs\": 3,\n  \"operation\": \"clear_old\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Clear All Batch Jobs (Testing)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/classes/assignments/batch/clear/all",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "classes",
+                                "assignments",
+                                "batch",
+                                "clear",
+                                "all"
+                            ]
+                        },
+                        "description": "⚠️ **CAUTION:** Clear ALL batch jobs regardless of status or age. This is a destructive operation for testing/development purposes.\n\n**Operation:** `clear_all`\n**Target:** ALL batch jobs (PENDING, PROCESSING, COMPLETED, FAILED, PARTIAL_SUCCESS)\n**Use Case:** Development testing, complete reset\n\n**⚠️ WARNING:**\n- This will clear ALL jobs including PENDING and PROCESSING\n- Use only in development/testing environments\n- Cannot be undone\n- May interrupt ongoing batch operations"
+                    },
+                    "response": [
+                        {
+                            "name": "All Jobs Cleared",
+                            "originalRequest": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{baseUrl}}/classes/assignments/batch/clear/all",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "classes",
+                                        "assignments",
+                                        "batch",
+                                        "clear",
+                                        "all"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"message\": \"Successfully cleared all 5 jobs\",\n  \"jobsCleared\": 5,\n  \"totalJobsBefore\": 5,\n  \"remainingJobs\": 0,\n  \"operation\": \"clear_all\"\n}"
+                        },
+                        {
+                            "name": "No Jobs To Clear",
+                            "originalRequest": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{baseUrl}}/classes/assignments/batch/clear/all",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "classes",
+                                        "assignments",
+                                        "batch",
+                                        "clear",
+                                        "all"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"message\": \"No jobs to clear\",\n  \"jobsCleared\": 0,\n  \"totalJobsBefore\": 0,\n  \"remainingJobs\": 0,\n  \"operation\": \"clear_all\"\n}"
+                        }
+                    ]
+                }
+            ],
+            "description": "User-class assignment endpoints implementing the core business logic of the User Class Management domain."
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Set default values for common variables",
+                    "if (!pm.environment.get('userId')) {",
+                    "    pm.environment.set('userId', '1');",
+                    "}",
+                    "if (!pm.environment.get('classId')) {",
+                    "    pm.environment.set('classId', '1');",
+                    "}"
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Basic response time test",
+                    "pm.test('Response time is less than 1000ms', function () {",
+                    "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                    "});",
+                    "",
+                    "// Content-Type test for JSON responses",
+                    "if (pm.response.code !== 204) {",
+                    "    pm.test('Response content type is JSON', function () {",
+                    "        pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                    "    });",
+                    "}"
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:3000",
+            "type": "string"
+        },
+        {
+            "key": "userId",
+            "value": "1",
+            "type": "string"
+        },
+        {
+            "key": "classId",
+            "value": "1",
+            "type": "string"
+        }
+    ]
+}
