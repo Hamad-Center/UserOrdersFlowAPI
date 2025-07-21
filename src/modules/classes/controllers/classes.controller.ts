@@ -115,4 +115,83 @@ export class ClassesController {
         return this.classesService.getAllBatchJobs();
     }
 
+    @Delete('assignments/batch/clear')
+    @HttpCode(HttpStatus.OK)
+    async cleanUpCompletedBatches() {
+        const beforeJobs = await this.classesService.getAllBatchJobs();
+        const beforeCount = beforeJobs.length;
+
+        console.log(`cleaning completed batches started...`, {
+            totalJobs: beforeCount,
+            context: 'ClassesController'
+        });
+
+        // Clean all completed batches (regardless of age)
+        const clearedCount = await this.classesService.cleanUpCompletedBatches();
+
+        const afterJobs = await this.classesService.getAllBatchJobs();
+        const remainingJobs = afterJobs.length;
+
+        return {
+            message: clearedCount === 0 ? 'No completed jobs to clear' : `Successfully cleared ${clearedCount} completed jobs`,
+            jobsCleared: clearedCount,
+            totalJobsBefore: beforeCount,
+            remainingJobs: remainingJobs,
+            operation: 'clear_completed'
+        };
+    }
+
+    @Delete('assignments/batch/clear/old')
+    @HttpCode(HttpStatus.OK)
+    async cleanUpOldBatches() {
+        const beforeJobs = await this.classesService.getAllBatchJobs();
+        const beforeCount = beforeJobs.length;
+
+        console.log(`cleaning old batches started...`, {
+            totalJobs: beforeCount,
+            context: 'ClassesController'
+        });
+
+        // Clean only old completed batches (24+ hours)
+        const clearedCount = await this.classesService.cleanUpOldBatches();
+
+        const afterJobs = await this.classesService.getAllBatchJobs();
+        const remainingJobs = afterJobs.length;
+
+        return {
+            message: clearedCount === 0 ? 'No old jobs to clear (older than 24 hours)' : `Successfully cleared ${clearedCount} old jobs`,
+            jobsCleared: clearedCount,
+            totalJobsBefore: beforeCount,
+            remainingJobs: remainingJobs,
+            operation: 'clear_old'
+        };
+    }
+
+    @Delete('assignments/batch/clear/all')
+    @HttpCode(HttpStatus.OK)
+    async cleanUpAllBatches() {
+        const beforeJobs = await this.classesService.getAllBatchJobs();
+        const beforeCount = beforeJobs.length;
+
+        console.log(`cleaning all batches started...`, {
+            totalJobs: beforeCount,
+            context: 'ClassesController'
+        });
+
+        // Clean ALL batches (for testing/development)
+        const clearedCount = await this.classesService.cleanUpAllBatches();
+
+        const afterJobs = await this.classesService.getAllBatchJobs();
+        const remainingJobs = afterJobs.length;
+
+        return {
+            message: clearedCount === 0 ? 'No jobs to clear' : `Successfully cleared all ${clearedCount} jobs`,
+            jobsCleared: clearedCount,
+            totalJobsBefore: beforeCount,
+            remainingJobs: remainingJobs,
+            operation: 'clear_all'
+        };
+    }
+
+
 }
