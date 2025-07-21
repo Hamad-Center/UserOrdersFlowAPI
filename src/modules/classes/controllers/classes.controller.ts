@@ -100,4 +100,13 @@ export class ClassesController {
         );
         return this.classesService.processBatchAssignments(batchDto);
     }
+
+    @Get('assignments/batch/:batchId/status')
+    async getBatchStatus(@Param('batchId') batchId: string) {
+        console.log('getting batch stauts', { batchId, context: 'ClassesController' });
+        return this.classesService.getBatchStatus(batchId);
+
+    }
+
+
 }
