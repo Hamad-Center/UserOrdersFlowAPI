@@ -58,8 +58,3 @@ bootstrap().catch((error) => {
   process.exit(1);
 });
 
-// Add this debug helper to main.ts temporarily
-console.log('🐛 All Redis Environment Variables:');
-console.log('REDIS_HOST:', process.env.REDIS_HOST);
-console.log('REDIS_PORT:', process.env.REDIS_PORT);
-console.log('REDIS_URL:', process.env.REDIS_URL);  // ← This might be the problem!
