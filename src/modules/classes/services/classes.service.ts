@@ -6,6 +6,10 @@ import { AssignUserToClassDto } from "../dto/assign-user-to-class.dto";
 import { BatchAssignUsersDto } from "../dto/batch-assign-users.dto";
 import { BatchStatus, IBatchJob, IBatchResponse } from "../interfaces/batch.interface";
 import { BatchProcessorService } from '../services/batch-processor.service'
+import { EventPublisherService } from "src/common/events/event-publisher.service";
+import { BatchAssignmentCompletedEvent, BatchAssignmentStartedEvent, UserAssignedToClassEvent } from "src/common/events/class-assignment.events";
+import { ConfigResourceTypes } from "@nestjs/microservices/external/kafka.interface";
+import { EVENT_PATTERNS } from "src/common/config/redis.config";
 
 @Injectable()
 export class ClassesService {
@@ -23,7 +27,8 @@ export class ClassesService {
 
     private assignements: IUserClassAssignment[] = [];
     constructor(
-        private readonly batchProcessor: BatchProcessorService
+        private readonly batchProcessor: BatchProcessorService,
+        private readonly eventPublisher: EventPublisherService,
     ) { }
 
 
@@ -102,15 +107,29 @@ export class ClassesService {
 
         const highestId = Math.max(...this.assignements.map(a => a.id), 0);
 
-        const assignement: IUserClassAssignment = {
+        const assignment: IUserClassAssignment = {
             id: highestId + 1,
             userId: assignmentDto.userId,
             classId: assignmentDto.classId,
             assignedAt: new Date(),
             status: assignmentDto.status || 'ACTIVE',
         };
-        this.assignements.push(assignement);
-        return assignement;
+        this.assignements.push(assignment);
+
+        // publish an event after successful assignment
+        const correlationId =
+            `assgning_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+        const event = new UserAssignedToClassEvent(
+            correlationId,
+            assignmentDto.userId,
+            assignmentDto.classId,
+            assignment.assignedAt
+        );
+
+        await this.eventPublisher.publishEvent(EVENT_PATTERNS.USER_ASSIGNED_TO_CLASS, event);
+
+        return assignment;
     }
 
     async unAssignUserFromClass(userId: number, classId: number): Promise<void> {
@@ -147,6 +166,11 @@ export class ClassesService {
             context: 'ClassesService'
         });
 
+        const correlationId = batchDto.correlationId || `batch_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const startedEvent = new BatchAssignmentStartedEvent(
+            correlationId, batchId, batchDto.assignments.length
+        );
+        await this.eventPublisher.publishEvent(EVENT_PATTERNS.BATCH_ASSIGNMENT_STARTED, startedEvent);
         const job = this.batchProcessor.createBatchJob(batchId, batchDto.assignments.length);
 
 
@@ -157,9 +181,23 @@ export class ClassesService {
                 // this is where the actual assignment happens 
                 await this.assignUserToClass(assignment);
             }
-        ).catch(error => {
-            console.error(`batch ${batchId} processing failed: `, error);
-        });
+        ).then(
+            async () => {
+                const completedJob = this.batchProcessor.getBatchJob(batchId);
+                if (completedJob) {
+                    const completedEvent = new BatchAssignmentCompletedEvent(
+                        correlationId,
+                        batchId,
+                        completedJob.successCount,
+                        completedJob.errorCount
+                    );
+                    await this.eventPublisher.publishEvent(EVENT_PATTERNS.BATCH_ASSIGNMENT_COMPLETED, completedEvent);
+                }
+            }
+        )
+            .catch(error => {
+                console.error(`batch ${batchId} processing failed: `, error);
+            });
 
         // estimated time for the batch to complete  
         const estimatedMs = batchDto.assignments.length * 100;
