@@ -1,7 +1,5 @@
-import { BullModuleOptions } from "@nestjs/bull";
-import { Param } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config"
-import { retry } from "rxjs"
+
 
 export const getRedisConfig = (configService: ConfigService) => ({
     transport: 'REDIS' as const,
@@ -10,30 +8,17 @@ export const getRedisConfig = (configService: ConfigService) => ({
         port: parseInt(configService.get('REDIS_PORT', '6379')),
         retryAttempts: 5,
         retryDelay: 1000,
+        maxRetriesPerRequest: 3
     },
 });
 
-/**
- * @param configService sets up redis connection for the bull job queue system
- * defines job cleanup policies 
- */
-export const getBullConfig = (configService: ConfigService): BullModuleOptions => ({
-    redis: {
-        host: configService.get('REDIS_HOST', 'redis'),
-        port: parseInt(configService.get('REDIS_PORT', '6379')),
-    },
-    defaultJobOptions: {
-        removeOnComplete: 100,
-        removeOnFail: 50,
-        attempts: 3,
-        backoff: {
-            type: 'exponential',
-            delay: 2000,
-        },
-    },
-});
+//these are event patterns for type safety 
 
-export const QUEUE_NAMES = {
-    BATCH_ASSIGNMENTS: 'batch-assignments',
-    USER_NOTIFICATIONS: 'user-notifications',
+export const EVENT_PATTERNS = {
+    USER_ASSIGNED_TO_CLASS: 'user.assigned.to.class',
+    BATCH_ASSIGNMENT_STARTED: 'batch.assignment.started',
+    BATCH_ASSIGNMENT_COMPLETED: 'batch.assignment.completed',
 } as const;
+
+
+export type EVENT_PATTERNS = typeof EVENT_PATTERNS[keyof typeof EVENT_PATTERNS]
