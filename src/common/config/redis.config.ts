@@ -1,17 +1,39 @@
-import { ConfigService } from "@nestjs/config"
+// src/config/redis.config.ts
+import { ConfigService } from '@nestjs/config';
+import { ClientOptions, Transport } from '@nestjs/microservices';
+
+export const getRedisConfig = (configService: ConfigService): ClientOptions => {
+    // Use individual host/port instead of full URL
+    const redisHost = configService.get<string>('REDIS_HOST', 'redis');
+    const redisPort = configService.get<number>('REDIS_PORT', 6379);
+
+    return {
+        transport: Transport.REDIS,
+        options: {
+            host: redisHost,
+            port: redisPort,
+            retryAttempts: 5,
+            retryDelay: 3000,
+        },
+    };
+};
+
+export const getRedisConfigFromUrl = (configService: ConfigService): ClientOptions => {
+    const redisUrl = configService.get<string>('REDIS_URL', 'redis://redis:6379');
 
 
-export const getRedisConfig = (configService: ConfigService) => ({
-    transport: 'REDIS' as const,
-    options: {
-        host: configService.get('REDIS_HOST', 'redis'),
-        port: parseInt(configService.get('REDIS_PORT', '6379')),
-        retryAttempts: 5,
-        retryDelay: 1000,
-        maxRetriesPerRequest: 3
-    },
-});
+    const url = new URL(redisUrl);
 
+    return {
+        transport: Transport.REDIS,
+        options: {
+            host: url.hostname,
+            port: parseInt(url.port) || 6379,
+            retryAttempts: 5,
+            retryDelay: 3000,
+        },
+    };
+};
 //these are event patterns for type safety 
 
 export const EVENT_PATTERNS = {
